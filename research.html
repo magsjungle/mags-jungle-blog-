@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Research — Mags Jungle</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Research page styles ─────────────────────────────────── */
+    .research-hero {
+      background: linear-gradient(135deg, var(--green-mid) 0%, var(--green-dark) 100%);
+      color: #fff;
+      text-align: center;
+      padding: 48px 24px 40px;
+    }
+
+    .research-hero h2 {
+      font-family: var(--font-heading);
+      font-size: 1.9rem;
+      margin-bottom: 8px;
+    }
+
+    .research-hero p {
+      color: var(--green-pale);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+
+    .search-form {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 380px;
+      outline: none;
+      color: var(--text);
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 3px var(--green-light);
+    }
+
+    .search-btn {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: bold;
+      background: var(--green-light);
+      color: var(--green-dark);
+      border: none;
+      border-radius: 28px;
+      padding: 12px 26px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .search-btn:hover { background: #3da870; }
+    .search-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* ── Results area ─────────────────────────────────────────── */
+    .results-wrap {
+      max-width: 900px;
+      margin: 36px auto 60px;
+      padding: 0 24px;
+    }
+
+    .results-meta {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 600px) {
+      .results-grid { grid-template-columns: 1fr; }
+      .research-hero h2 { font-size: 1.45rem; }
+    }
+
+    .results-col h3 {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      color: var(--green-dark);
+      padding: 10px 14px;
+      background: var(--green-pale);
+      border-radius: 8px 8px 0 0;
+      margin: 0;
+    }
+
+    .results-col-inner {
+      background: #fff;
+      border: 1px solid var(--green-pale);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 16px;
+      min-height: 120px;
+    }
+
+    .suggestion-group {
+      margin-bottom: 18px;
+    }
+
+    .suggestion-group:last-child { margin-bottom: 0; }
+
+    .suggestion-group-label {
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--green-mid);
+      margin-bottom: 8px;
+    }
+
+    .suggestion-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .suggestion-list li {
+      font-size: 0.9rem;
+      color: var(--text);
+      padding: 5px 0;
+      border-bottom: 1px solid #f0f0f0;
+      line-height: 1.4;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .suggestion-list li:last-child { border-bottom: none; }
+
+    .suggestion-list li:hover {
+      color: var(--green-mid);
+    }
+
+    .suggestion-list li::before {
+      content: '·  ';
+      color: var(--green-light);
+      font-weight: bold;
+    }
+
+    .empty-state {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .error-msg {
+      color: #c0392b;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .loading {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin-top: 32px;
+    }
+
+    .loading-dot {
+      display: inline-block;
+      animation: blink 1.2s infinite;
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.2; }
+      40% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <h1>🌿 Mags <span>Jungle</span></h1>
+      <div class="tagline">Real plants. Real talk. Real results.</div>
+    </a>
+    <nav>
+      <a href="index.html">Blog</a>
+      <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok</a>
+      <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram</a>
+    </nav>
+  </div>
+</header>
+
+<div class="research-hero">
+  <h2>Content Research Tool 🔍</h2>
+  <p>Find what people are actually searching for — so your TikToks hit real demand.</p>
+  <form class="search-form" id="searchForm">
+    <input
+      type="text"
+      class="search-input"
+      id="searchInput"
+      placeholder="e.g. succulent propagation"
+      autocomplete="off"
+      autocorrect="off"
+      spellcheck="false"
+    />
+    <button type="submit" class="search-btn" id="searchBtn">Search</button>
+  </form>
+</div>
+
+<div class="results-wrap" id="resultsWrap"></div>
+
+<footer>
+  <div class="social-links">
+    <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok @magsjungle</a>
+    <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram @mags_jungle</a>
+  </div>
+  <p>© 2026 Mags Jungle · Made with 🌿 · <em>Some links are affiliate links. I only recommend products I actually use.</em></p>
+</footer>
+
+<script>
+  const form = document.getElementById('searchForm');
+  const input = document.getElementById('searchInput');
+  const btn = document.getElementById('searchBtn');
+  const wrap = document.getElementById('resultsWrap');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    await runSearch(q);
+  });
+
+  async function runSearch(q) {
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    wrap.innerHTML = `<div class="loading">Fetching suggestions<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span></div>`;
+
+    try {
+      const res = await fetch(`/.netlify/functions/keywords?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+      renderResults(data);
+    } catch (err) {
+      wrap.innerHTML = `<p class="error-msg">Something went wrong: ${err.message}. Try again in a moment.</p>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Search';
+    }
+  }
+
+  function renderResults({ keyword, google, youtube }) {
+    const total = google.length + youtube.length;
+    wrap.innerHTML = `
+      <p class="results-meta">Showing ${total} suggestions for "<strong>${escHtml(keyword)}</strong>"</p>
+      <div class="results-grid">
+        <div class="results-col">
+          <h3>🔍 Google Searches</h3>
+          <div class="results-col-inner">${renderColumn(google)}</div>
+        </div>
+        <div class="results-col">
+          <h3>▶️ YouTube Searches</h3>
+          <div class="results-col-inner">${renderColumn(youtube)}</div>
+        </div>
+      </div>
+    `;
+
+    // Make suggestions clickable to re-search
+    wrap.querySelectorAll('.suggestion-list li').forEach(li => {
+      li.addEventListener('click', () => {
+        input.value = li.dataset.term;
+        runSearch(li.dataset.term);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  }
+
+  function renderColumn(suggestions) {
+    if (!suggestions.length) {
+      return '<p class="empty-state">No suggestions found.</p>';
+    }
+
+    const groups = groupSuggestions(suggestions);
+    let html = '';
+
+    if (groups.questions.length) {
+      html += renderGroup('Questions', groups.questions);
+    }
+    if (groups.comparisons.length) {
+      html += renderGroup('Comparisons', groups.comparisons);
+    }
+    if (groups.general.length) {
+      html += renderGroup('Popular', groups.general);
+    }
+
+    return html;
+  }
+
+  function groupSuggestions(suggestions) {
+    const questionWords = /^(how|why|what|when|where|which|who|can|do|does|is|are|will|should)/i;
+    const comparisonWords = /\bvs\.?\b|\bversus\b|\bor\b/i;
+
+    const questions = [];
+    const comparisons = [];
+    const general = [];
+
+    for (const s of suggestions) {
+      if (questionWords.test(s)) {
+        questions.push(s);
+      } else if (comparisonWords.test(s)) {
+        comparisons.push(s);
+      } else {
+        general.push(s);
+      }
+    }
+
+    return { questions, comparisons, general };
+  }
+
+  function renderGroup(label, items) {
+    const lis = items
+      .map(s => `<li data-term="${escAttr(s)}">${escHtml(s)}</li>`)
+      .join('');
+    return `
+      <div class="suggestion-group">
+        <div class="suggestion-group-label">${label}</div>
+        <ul class="suggestion-list">${lis}</ul>
+      </div>
+    `;
+  }
+
+  function escHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function escAttr(str) {
+    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+</script>
+
+</body>
+</html>
