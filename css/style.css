@@ -99,6 +99,45 @@ nav a:hover { color: var(--green-light); }
   margin: 0 auto;
 }
 
+/* ── Hero extras ──────────────────────────────────────────────── */
+.hero-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--green-light);
+  margin: 0 auto 20px;
+  display: block;
+}
+
+.hero-sub {
+  font-size: 1rem;
+  color: var(--green-pale);
+  margin-top: 8px;
+}
+
+.hero-socials {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.btn-instagram {
+  display: inline-block;
+  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  padding: 10px 24px;
+  border-radius: 24px;
+  transition: opacity 0.2s;
+}
+
+.btn-instagram:hover { opacity: 0.85; }
+
 /* ── Main layout ──────────────────────────────────────────────── */
 main {
   max-width: 900px;
