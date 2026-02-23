@@ -1,0 +1,7 @@
+{
+  "name": "mags-jungle-blog",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@netlify/plugin-sitemap": "^0.9.0"
+  }
+}

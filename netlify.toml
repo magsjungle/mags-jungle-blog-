@@ -4,3 +4,13 @@
 
 [build.environment]
   NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+  [plugins.inputs]
+    buildDir = "."
+    exclude = [
+      "/research.html",
+      "/google833bd3acc0ce5407.html"
+    ]
