@@ -6,7 +6,7 @@
   <title>Content Research — Mags Jungle</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    /* ── Research page styles ─────────────────────────────────── */
+    /* ── Research page ─────────────────────────────────────────── */
     .research-hero {
       background: linear-gradient(135deg, var(--green-mid) 0%, var(--green-dark) 100%);
       color: #fff;
@@ -63,14 +63,14 @@
       transition: background 0.2s;
     }
 
-    .search-btn:hover { background: #3da870; }
+    .search-btn:hover  { background: #3da870; }
     .search-btn:disabled { opacity: 0.6; cursor: default; }
 
-    /* ── Results area ─────────────────────────────────────────── */
+    /* ── Results area ──────────────────────────────────────────── */
     .results-wrap {
-      max-width: 900px;
+      max-width: 980px;
       margin: 36px auto 60px;
-      padding: 0 24px;
+      padding: 0 20px;
     }
 
     .results-meta {
@@ -80,83 +80,116 @@
       text-align: center;
     }
 
+    /* 2 × 2 grid on desktop, 1-col on mobile */
     .results-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 20px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .results-grid { grid-template-columns: 1fr; }
       .research-hero h2 { font-size: 1.45rem; }
     }
 
-    .results-col h3 {
+    /* ── Platform column ───────────────────────────────────────── */
+    .platform-col {}
+
+    .platform-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-family: var(--font-heading);
-      font-size: 1rem;
-      color: var(--green-dark);
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #fff;
       padding: 10px 14px;
-      background: var(--green-pale);
       border-radius: 8px 8px 0 0;
-      margin: 0;
     }
 
-    .results-col-inner {
+    .platform-header.google    { background: #1a73e8; }
+    .platform-header.youtube   { background: #ff0000; }
+    .platform-header.tiktok    { background: #010101; }
+    .platform-header.instagram { background: linear-gradient(90deg, #833ab4, #e1306c); }
+
+    .platform-header .count-badge {
+      margin-left: auto;
+      font-size: 0.72rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 2px 8px;
+    }
+
+    .platform-body {
       background: #fff;
-      border: 1px solid var(--green-pale);
+      border: 1px solid #e8e8e8;
       border-top: none;
       border-radius: 0 0 8px 8px;
-      padding: 16px;
-      min-height: 120px;
+      padding: 12px 14px;
+      min-height: 140px;
     }
 
-    .suggestion-group {
-      margin-bottom: 18px;
-    }
-
-    .suggestion-group:last-child { margin-bottom: 0; }
-
-    .suggestion-group-label {
-      font-family: var(--font-heading);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--green-mid);
-      margin-bottom: 8px;
-    }
-
-    .suggestion-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .suggestion-list li {
-      font-size: 0.9rem;
-      color: var(--text);
-      padding: 5px 0;
-      border-bottom: 1px solid #f0f0f0;
-      line-height: 1.4;
+    /* ── Suggestion rows ───────────────────────────────────────── */
+    .suggestion-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid #f2f2f2;
       cursor: pointer;
+    }
+
+    .suggestion-row:last-child { border-bottom: none; }
+
+    .suggestion-row:hover .suggestion-text { color: var(--green-mid); }
+
+    /* Demand bar */
+    .bar-track {
+      flex-shrink: 0;
+      width: 52px;
+      height: 6px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .google    .bar-fill { background: #1a73e8; }
+    .youtube   .bar-fill { background: #ff0000; }
+    .tiktok    .bar-fill { background: #00f2ea; }
+    .instagram .bar-fill { background: #e1306c; }
+
+    .suggestion-text {
+      font-size: 0.875rem;
+      color: var(--text);
+      line-height: 1.35;
+      flex: 1;
       transition: color 0.15s;
     }
 
-    .suggestion-list li:last-child { border-bottom: none; }
-
-    .suggestion-list li:hover {
-      color: var(--green-mid);
+    /* Instagram post count */
+    .ig-count {
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-family: var(--font-heading);
+      background: #fce4ec;
+      color: #c2185b;
+      border-radius: 10px;
+      padding: 2px 7px;
+      white-space: nowrap;
     }
 
-    .suggestion-list li::before {
-      content: '·  ';
-      color: var(--green-light);
-      font-weight: bold;
-    }
-
-    .empty-state {
-      color: var(--text-light);
-      font-size: 0.9rem;
+    /* ── States ────────────────────────────────────────────────── */
+    .empty-msg {
+      font-size: 0.85rem;
+      color: #aaa;
       font-style: italic;
+      padding: 8px 0;
     }
 
     .error-msg {
@@ -182,7 +215,7 @@
 
     @keyframes blink {
       0%, 80%, 100% { opacity: 0.2; }
-      40% { opacity: 1; }
+      40%  { opacity: 1; }
     }
   </style>
 </head>
@@ -204,7 +237,7 @@
 
 <div class="research-hero">
   <h2>Content Research Tool 🔍</h2>
-  <p>Find what people are actually searching for — so your TikToks hit real demand.</p>
+  <p>Find what people are actually searching for across every platform.</p>
   <form class="search-form" id="searchForm">
     <input
       type="text"
@@ -230,22 +263,27 @@
 </footer>
 
 <script>
-  const form = document.getElementById('searchForm');
+  const form  = document.getElementById('searchForm');
   const input = document.getElementById('searchInput');
-  const btn = document.getElementById('searchBtn');
-  const wrap = document.getElementById('resultsWrap');
+  const btn   = document.getElementById('searchBtn');
+  const wrap  = document.getElementById('resultsWrap');
 
-  form.addEventListener('submit', async (e) => {
+  // Auto-run if ?q= is in the URL
+  const urlQ = new URLSearchParams(location.search).get('q');
+  if (urlQ) { input.value = urlQ; runSearch(urlQ); }
+
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     const q = input.value.trim();
-    if (!q) return;
-    await runSearch(q);
+    if (q) runSearch(q);
   });
 
   async function runSearch(q) {
     btn.disabled = true;
     btn.textContent = 'Searching…';
-    wrap.innerHTML = `<div class="loading">Fetching suggestions<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span></div>`;
+    // Update URL so you can share / bookmark the search
+    history.replaceState(null, '', `?q=${encodeURIComponent(q)}`);
+    wrap.innerHTML = `<div class="loading">Fetching<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span></div>`;
 
     try {
       const res = await fetch(`/.netlify/functions/keywords?q=${encodeURIComponent(q)}`);
@@ -260,88 +298,126 @@
     }
   }
 
-  function renderResults({ keyword, google, youtube }) {
-    const total = google.length + youtube.length;
+  function renderResults({ keyword, google, youtube, tiktok, instagram }) {
+    const totalGoogle = google.length;
+    const totalYT     = youtube.length;
+    const totalTT     = tiktok.length;
+    const totalIG     = instagram.length;
+    const total       = totalGoogle + totalYT + totalTT + totalIG;
+
     wrap.innerHTML = `
-      <p class="results-meta">Showing ${total} suggestions for "<strong>${escHtml(keyword)}</strong>"</p>
+      <p class="results-meta">
+        <strong>${escHtml(keyword)}</strong> —
+        ${totalGoogle} Google · ${totalYT} YouTube · ${totalTT} TikTok · ${totalIG} Instagram results
+        <br><small style="color:#bbb">Bars show relative demand — longer = searched more</small>
+      </p>
       <div class="results-grid">
-        <div class="results-col">
-          <h3>🔍 Google Searches</h3>
-          <div class="results-col-inner">${renderColumn(google)}</div>
+        <div class="platform-col google">
+          <div class="platform-header google">
+            🔍 Google Searches
+            <span class="count-badge">${totalGoogle}</span>
+          </div>
+          <div class="platform-body">
+            ${renderSearchCol(google, 'google')}
+          </div>
         </div>
-        <div class="results-col">
-          <h3>▶️ YouTube Searches</h3>
-          <div class="results-col-inner">${renderColumn(youtube)}</div>
+
+        <div class="platform-col youtube">
+          <div class="platform-header youtube">
+            ▶️ YouTube Searches
+            <span class="count-badge">${totalYT}</span>
+          </div>
+          <div class="platform-body">
+            ${renderSearchCol(youtube, 'youtube')}
+          </div>
+        </div>
+
+        <div class="platform-col tiktok">
+          <div class="platform-header tiktok">
+            🎵 TikTok Searches
+            <span class="count-badge">${totalTT}</span>
+          </div>
+          <div class="platform-body">
+            ${renderSearchCol(tiktok, 'tiktok')}
+          </div>
+        </div>
+
+        <div class="platform-col instagram">
+          <div class="platform-header instagram">
+            📸 Instagram Hashtags
+            <span class="count-badge">${totalIG}</span>
+          </div>
+          <div class="platform-body">
+            ${renderHashtagCol(instagram)}
+          </div>
         </div>
       </div>
     `;
 
-    // Make suggestions clickable to re-search
-    wrap.querySelectorAll('.suggestion-list li').forEach(li => {
-      li.addEventListener('click', () => {
-        input.value = li.dataset.term;
-        runSearch(li.dataset.term);
+    // Click any suggestion → re-search that term
+    wrap.querySelectorAll('.suggestion-row[data-term]').forEach(row => {
+      row.addEventListener('click', () => {
+        input.value = row.dataset.term;
+        runSearch(row.dataset.term);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
   }
 
-  function renderColumn(suggestions) {
+  function renderSearchCol(suggestions, platform) {
     if (!suggestions.length) {
-      return '<p class="empty-state">No suggestions found.</p>';
+      return `<p class="empty-msg">No results — ${platform === 'tiktok' ? 'TikTok may be unavailable' : 'try a different keyword'}.</p>`;
     }
-
-    const groups = groupSuggestions(suggestions);
-    let html = '';
-
-    if (groups.questions.length) {
-      html += renderGroup('Questions', groups.questions);
-    }
-    if (groups.comparisons.length) {
-      html += renderGroup('Comparisons', groups.comparisons);
-    }
-    if (groups.general.length) {
-      html += renderGroup('Popular', groups.general);
-    }
-
-    return html;
-  }
-
-  function groupSuggestions(suggestions) {
-    const questionWords = /^(how|why|what|when|where|which|who|can|do|does|is|are|will|should)/i;
-    const comparisonWords = /\bvs\.?\b|\bversus\b|\bor\b/i;
-
-    const questions = [];
-    const comparisons = [];
-    const general = [];
-
-    for (const s of suggestions) {
-      if (questionWords.test(s)) {
-        questions.push(s);
-      } else if (comparisonWords.test(s)) {
-        comparisons.push(s);
-      } else {
-        general.push(s);
-      }
-    }
-
-    return { questions, comparisons, general };
-  }
-
-  function renderGroup(label, items) {
-    const lis = items
-      .map(s => `<li data-term="${escAttr(s)}">${escHtml(s)}</li>`)
+    const total = suggestions.length;
+    return suggestions
+      .map((text, i) => {
+        const pct = barPct(i, total);
+        return `
+          <div class="suggestion-row" data-term="${escAttr(text)}">
+            <div class="bar-track">
+              <div class="bar-fill" style="width:${pct}%"></div>
+            </div>
+            <span class="suggestion-text">${escHtml(text)}</span>
+          </div>
+        `;
+      })
       .join('');
-    return `
-      <div class="suggestion-group">
-        <div class="suggestion-group-label">${label}</div>
-        <ul class="suggestion-list">${lis}</ul>
-      </div>
-    `;
+  }
+
+  function renderHashtagCol(hashtags) {
+    if (!hashtags.length) {
+      return `<p class="empty-msg">Instagram data unavailable — try logging into Instagram first, then revisit.</p>`;
+    }
+    // Sort by post count descending (highest demand first)
+    const sorted = [...hashtags].sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
+    return sorted
+      .map(({ name, count }) => {
+        const searchTerm = name; // re-search without # for multi-platform
+        return `
+          <div class="suggestion-row" data-term="${escAttr(name)}">
+            ${count != null ? `<span class="ig-count">${formatCount(count)}</span>` : ''}
+            <span class="suggestion-text">#${escHtml(name)}</span>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  // Position 0 = 100%, last position ≈ 15%
+  function barPct(index, total) {
+    if (total <= 1) return 100;
+    return Math.round(100 - (index / (total - 1)) * 85);
+  }
+
+  function formatCount(n) {
+    if (!n) return '';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+    if (n >= 1_000)     return (n / 1_000).toFixed(0) + 'K';
+    return n.toString();
   }
 
   function escHtml(str) {
-    return str
+    return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -349,7 +425,9 @@
   }
 
   function escAttr(str) {
-    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(str)
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 </script>
 
