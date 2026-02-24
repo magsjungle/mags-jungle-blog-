@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const BASE_URL = "https://magsjungle.netlify.app";
+const BASE_URL = "https://magsjungle.com";
 const EXCLUDE = ["google833bd3acc0ce5407.html", "research.html"];
 
 function findHtmlFiles(dir, base = dir) {
