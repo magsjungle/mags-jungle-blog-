@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://magsjungle.netlify.app/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://magsjungle.netlify.app/posts/monstera-care-routine</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://magsjungle.netlify.app/posts/succulent-propagation-experiment</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  <url><loc>https://magsjungle.com/</loc></url>
+  <url><loc>https://magsjungle.com/shop.html</loc></url>
+  <url><loc>https://magsjungle.com/reviews.html</loc></url>
+  <url><loc>https://magsjungle.com/posts/monstera-care-routine.html</loc></url>
+  <url><loc>https://magsjungle.com/posts/succulent-propagation-experiment.html</loc></url>
+  <url><loc>https://magsjungle.com/posts/jade-plant-leggy-after-pruning.html</loc></url>
+  <url><loc>https://magsjungle.com/posts/purived-houseplant-food-review.html</loc></url>
 </urlset>
