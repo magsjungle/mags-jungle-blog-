@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Footage Catalog — Mags Jungle</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Catalog page ──────────────────────────────────────────── */
+    .catalog-hero {
+      background: linear-gradient(135deg, var(--green-mid) 0%, var(--green-dark) 100%);
+      color: #fff;
+      padding: 36px 24px 32px;
+      text-align: center;
+    }
+    .catalog-hero h2 {
+      font-family: var(--font-heading);
+      font-size: 1.7rem;
+      margin-bottom: 6px;
+    }
+    .catalog-hero p {
+      color: var(--green-pale);
+      font-size: 0.95rem;
+      margin: 0 auto 20px;
+      max-width: 480px;
+    }
+
+    /* ── Filter bar ────────────────────────────────────────────── */
+    .filter-bar {
+      background: var(--green-dark);
+      padding: 0 24px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .filter-bar select, .filter-bar input {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+    .filter-bar select option { color: var(--text); background: #fff; }
+    .filter-bar input::placeholder { color: rgba(255,255,255,0.5); }
+    .filter-bar input:focus, .filter-bar select:focus {
+      background: rgba(255,255,255,0.2);
+    }
+    .filter-reset {
+      font-family: var(--font-heading);
+      font-size: 0.82rem;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: var(--green-pale);
+      border-radius: 20px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .filter-reset:hover { background: rgba(255,255,255,0.1); }
+
+    /* ── Stats bar ─────────────────────────────────────────────── */
+    .stats-bar {
+      max-width: 980px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+    .stat-pill {
+      background: var(--green-pale);
+      color: var(--green-mid);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+    }
+
+    /* ── Catalog grid ──────────────────────────────────────────── */
+    .catalog-wrap {
+      max-width: 980px;
+      margin: 16px auto 60px;
+      padding: 0 20px;
+    }
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Clip card ─────────────────────────────────────────────── */
+    .clip-card {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .clip-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+    .clip-card.posted { opacity: 0.55; }
+
+    .clip-thumb {
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      background: var(--green-pale);
+      position: relative;
+    }
+    .clip-thumb.video-thumb { background: #e8f4fd; }
+    .clip-thumb.dog-thumb   { background: #fef3e2; }
+    .clip-thumb.person-thumb { background: #fce4ec; }
+
+    .type-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.62rem;
+      font-family: var(--font-heading);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 5px;
+    }
+
+    .clip-body {
+      padding: 10px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .clip-title {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      color: var(--green-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .clip-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .tag {
+      font-size: 0.67rem;
+      font-family: var(--font-heading);
+      border-radius: 10px;
+      padding: 2px 7px;
+    }
+    .tag-cultivar  { background: var(--green-pale); color: var(--green-mid); }
+    .tag-activity  { background: #e3f2fd; color: #1565c0; }
+    .tag-month     { background: #f3e5f5; color: #6a1b9a; }
+
+    .clip-date {
+      font-size: 0.7rem;
+      color: #bbb;
+      margin-top: 2px;
+    }
+
+    .clip-actions {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .btn-dropbox {
+      flex: 1;
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      background: var(--green-mid);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 6px 0;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.15s;
+    }
+    .btn-dropbox:hover { background: var(--green-dark); }
+
+    .btn-posted {
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      background: #f5f5f5;
+      color: var(--text-light);
+      border: none;
+      border-radius: 14px;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .btn-posted.is-posted {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-posted:hover { background: #eee; }
+    .btn-posted.is-posted:hover { background: #d96a00; }
+
+    /* ── Empty state ───────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      color: var(--text-light);
+      padding: 60px 0;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 600px) {
+      .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+      .catalog-hero h2 { font-size: 1.3rem; }
+      .clip-thumb { height: 80px; font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <h1>🌿 Mags <span>Jungle</span></h1>
+      <div class="tagline">Real plants. Real talk. Real results.</div>
+    </a>
+    <nav>
+      <a href="index.html">Blog</a>
+      <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok</a>
+      <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram</a>
+    </nav>
+  </div>
+</header>
+
+<div class="catalog-hero">
+  <h2>Footage Catalog 🎬</h2>
+  <p>All your sorted photos and videos — find anything in seconds.</p>
+</div>
+
+<div class="filter-bar">
+  <input type="text" id="searchBox" placeholder="🔍 Search filename..." />
+  <select id="filterCultivar"><option value="">All Plants</option></select>
+  <select id="filterActivity"><option value="">All Activities</option></select>
+  <select id="filterMonth"><option value="">All Months</option></select>
+  <select id="filterType">
+    <option value="">Photos + Videos</option>
+    <option value="photo">Photos only</option>
+    <option value="video">Videos only</option>
+  </select>
+  <select id="filterPosted">
+    <option value="">All</option>
+    <option value="no">Not posted</option>
+    <option value="yes">Already posted</option>
+  </select>
+  <button class="filter-reset" id="resetBtn">Reset</button>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="catalog-wrap">
+  <div class="catalog-grid" id="grid"></div>
+</div>
+
+<footer>
+  <div class="social-links">
+    <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok @magsjungle</a>
+    <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram @mags_jungle</a>
+  </div>
+  <p>© 2026 Mags Jungle · Made with 🌿</p>
+</footer>
+
+<script>
+  // ── Data & state ─────────────────────────────────────────────
+  let ALL = [];
+  const POSTED_KEY = 'mj_posted_v1';
+
+  function getPosted() {
+    try { return new Set(JSON.parse(localStorage.getItem(POSTED_KEY) || '[]')); }
+    catch { return new Set(); }
+  }
+  function togglePosted(id) {
+    const s = getPosted();
+    s.has(id) ? s.delete(id) : s.add(id);
+    localStorage.setItem(POSTED_KEY, JSON.stringify([...s]));
+  }
+
+  // ── Dropbox link builder ──────────────────────────────────────
+  function dropboxLink(path) {
+    // Opens the file's folder in Dropbox web
+    const folder = path.substring(0, path.lastIndexOf('/'));
+    return `https://www.dropbox.com/home${encodeURI(folder)}`;
+  }
+
+  // ── Emoji per category/type ───────────────────────────────────
+  function cardEmoji(entry) {
+    if (entry.category === 'dog')    return '🐕';
+    if (entry.category === 'person') return '🤳';
+    if (entry.type === 'video')      return '🎬';
+    return '🌿';
+  }
+  function thumbClass(entry) {
+    if (entry.category === 'dog')    return 'dog-thumb';
+    if (entry.category === 'person') return 'person-thumb';
+    if (entry.type === 'video')      return 'video-thumb';
+    return '';
+  }
+
+  // ── Render ────────────────────────────────────────────────────
+  function render(data) {
+    const grid   = document.getElementById('grid');
+    const posted = getPosted();
+
+    if (!data.length) {
+      grid.innerHTML = '<div class="empty-state">No clips match your filters.</div>';
+      return;
+    }
+
+    grid.innerHTML = data.map(e => {
+      const isPosted = posted.has(e.id);
+      return `
+        <div class="clip-card${isPosted ? ' posted' : ''}" data-id="${e.id}">
+          <div class="clip-thumb ${thumbClass(e)}">
+            ${cardEmoji(e)}
+            <span class="type-badge">${e.type}</span>
+          </div>
+          <div class="clip-body">
+            <div class="clip-title" title="${escHtml(e.name)}">${escHtml(e.name)}</div>
+            <div class="clip-tags">
+              ${e.cultivar ? `<span class="tag tag-cultivar">${escHtml(e.cultivar)}</span>` : ''}
+              ${e.activity ? `<span class="tag tag-activity">${escHtml(e.activity)}</span>` : ''}
+              ${e.month    ? `<span class="tag tag-month">${escHtml(e.month)}</span>` : ''}
+            </div>
+            ${e.date ? `<div class="clip-date">${e.date}</div>` : ''}
+          </div>
+          <div class="clip-actions">
+            <a class="btn-dropbox" href="${dropboxLink(e.path)}" target="_blank">Open in Dropbox</a>
+            <button class="btn-posted${isPosted ? ' is-posted' : ''}" data-id="${e.id}">
+              ${isPosted ? '✓ Posted' : 'Posted?'}
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Posted toggle handlers
+    grid.querySelectorAll('.btn-posted').forEach(btn => {
+      btn.addEventListener('click', () => {
+        togglePosted(btn.dataset.id);
+        const card = grid.querySelector(`.clip-card[data-id="${btn.dataset.id}"]`);
+        const now  = getPosted().has(btn.dataset.id);
+        card.classList.toggle('posted', now);
+        btn.classList.toggle('is-posted', now);
+        btn.textContent = now ? '✓ Posted' : 'Posted?';
+      });
+    });
+  }
+
+  // ── Filters ───────────────────────────────────────────────────
+  function populateFilters(data) {
+    const cultivars  = [...new Set(data.map(e => e.cultivar).filter(Boolean))].sort();
+    const activities = [...new Set(data.map(e => e.activity).filter(Boolean))].sort();
+    const months     = [...new Set(data.map(e => e.month).filter(Boolean))].sort().reverse();
+
+    fill('filterCultivar', cultivars, 'All Plants');
+    fill('filterActivity', activities, 'All Activities');
+    fill('filterMonth',    months,     'All Months');
+  }
+
+  function fill(id, vals, placeholder) {
+    const sel = document.getElementById(id);
+    sel.innerHTML = `<option value="">${placeholder}</option>` +
+      vals.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join('');
+  }
+
+  function applyFilters() {
+    const search   = document.getElementById('searchBox').value.toLowerCase();
+    const cultivar = document.getElementById('filterCultivar').value;
+    const activity = document.getElementById('filterActivity').value;
+    const month    = document.getElementById('filterMonth').value;
+    const type     = document.getElementById('filterType').value;
+    const postedF  = document.getElementById('filterPosted').value;
+    const posted   = getPosted();
+
+    const filtered = ALL.filter(e => {
+      if (search   && !e.name.toLowerCase().includes(search))      return false;
+      if (cultivar && e.cultivar !== cultivar)                      return false;
+      if (activity && e.activity !== activity)                      return false;
+      if (month    && e.month    !== month)                         return false;
+      if (type     && e.type     !== type)                          return false;
+      if (postedF === 'yes' && !posted.has(e.id))                   return false;
+      if (postedF === 'no'  &&  posted.has(e.id))                   return false;
+      return true;
+    });
+
+    updateStats(filtered.length, ALL.length, posted.size);
+    render(filtered);
+  }
+
+  function updateStats(showing, total, postedCount) {
+    document.getElementById('statsBar').innerHTML = `
+      <span>${showing} of ${total} clips</span>
+      <span class="stat-pill">🌿 ${ALL.filter(e=>e.category==='plant').length} plants</span>
+      <span class="stat-pill">🎬 ${ALL.filter(e=>e.type==='video').length} videos</span>
+      <span class="stat-pill">📸 ${ALL.filter(e=>e.type==='photo').length} photos</span>
+      <span class="stat-pill">✓ ${postedCount} posted</span>
+    `;
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────
+  ['searchBox','filterCultivar','filterActivity','filterMonth','filterType','filterPosted']
+    .forEach(id => document.getElementById(id).addEventListener('input', applyFilters));
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('searchBox').value = '';
+    ['filterCultivar','filterActivity','filterMonth','filterType','filterPosted']
+      .forEach(id => document.getElementById(id).value = '');
+    applyFilters();
+  });
+
+  fetch('catalog.json')
+    .then(r => r.json())
+    .then(data => {
+      // Most recent first
+      ALL = data.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      populateFilters(ALL);
+      applyFilters();
+    })
+    .catch(() => {
+      document.getElementById('grid').innerHTML =
+        '<div class="empty-state">Catalog is loading — check back in a few minutes.</div>';
+    });
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>
