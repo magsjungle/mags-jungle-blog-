@@ -14210,5 +14210,71 @@
     "month": "2026-02",
     "date": "2026-02-24",
     "path": "/Camera Uploads/Magui Photos/Dogs/2026-02-24 10.22.04.mov"
+  },
+  {
+    "id": "42bd0439b84af08a",
+    "name": "2026-02-24 10.15.58.mov",
+    "type": "video",
+    "category": "dog",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-24",
+    "path": "/Camera Uploads/Magui Photos/Dogs/2026-02-24 10.15.58.mov"
+  },
+  {
+    "id": "63486342d00c09b2",
+    "name": "2026-02-24 11.24.59.mov",
+    "type": "video",
+    "category": "unknown",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-24",
+    "path": "/Camera Uploads/Magui Photos/2026-02-24 11.24.59.mov"
+  },
+  {
+    "id": "2930eda0950b583d",
+    "name": "2026-02-24 10.15.54.jpg",
+    "type": "photo",
+    "category": "dog",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-24",
+    "path": "/Camera Uploads/Magui Photos/Dogs/2026-02-24 10.15.54.jpg"
+  },
+  {
+    "id": "1b17593b97c86e7e",
+    "name": "2026-02-24 11.53.19.mov",
+    "type": "video",
+    "category": "dog",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-24",
+    "path": "/Camera Uploads/Magui Photos/Dogs/2026-02-24 11.53.19.mov"
+  },
+  {
+    "id": "7d0dd7030ca0ed2b",
+    "name": "2026-02-24 11.21.27.mov",
+    "type": "video",
+    "category": "unknown",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-24",
+    "path": "/Camera Uploads/Magui Photos/2026-02-24 11.21.27.mov"
+  },
+  {
+    "id": "386f24401cadc18a",
+    "name": "2026-02-24 10.56.38.mov",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Flowers",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-24",
+    "path": "/Camera Uploads/2026-02/Plants/Flowers/2026-02-24 10.56.38.mov"
   }
 ]
