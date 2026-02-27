@@ -18335,5 +18335,115 @@
     "month": "2026-01",
     "date": "2026-01-02",
     "path": "/Camera Uploads/Magui Photos/2026-01-02 12.57.56.mov"
+  },
+  {
+    "id": "d4f55e50143c3e23",
+    "name": "2026-02-27 10.52.37.jpg",
+    "type": "photo",
+    "category": "person",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/Magui Photos/2026-02-27 10.52.37.jpg"
+  },
+  {
+    "id": "528641d48e2e5286",
+    "name": "2026-02-27 12.02.06.mov",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Flowers",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Flowers/2026-02-27 12.02.06.mov"
+  },
+  {
+    "id": "12ec316142a340ba",
+    "name": "2026-02-27 10.52.49.jpg",
+    "type": "photo",
+    "category": "person",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/Magui Photos/2026-02-27 10.52.49.jpg"
+  },
+  {
+    "id": "b889aa8101f24ff2",
+    "name": "2026-02-27 10.53.49.mov",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Flowers",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Flowers/2026-02-27 10.53.49.mov"
+  },
+  {
+    "id": "686d719569df91ee",
+    "name": "2026-02-27 10.54.51.mov",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Houseplants",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Houseplants/2026-02-27 10.54.51.mov"
+  },
+  {
+    "id": "3f51440374e644fd",
+    "name": "2026-02-27 10.52.53.jpg",
+    "type": "photo",
+    "category": "plant",
+    "cultivar": "Flowers",
+    "activity": "",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Flowers/2026-02-27 10.52.53.jpg"
+  },
+  {
+    "id": "cd440e071d1e1fc0",
+    "name": "2026-02-27 10.45.02.jpg",
+    "type": "photo",
+    "category": "plant",
+    "cultivar": "Houseplants",
+    "activity": "Watering",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Houseplants/Watering/2026-02-27 10.45.02.jpg"
+  },
+  {
+    "id": "6b0cb52bec464190",
+    "name": "2026-02-27 10.53.07.mov",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Flowers",
+    "activity": "Watering",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Flowers/Watering/2026-02-27 10.53.07.mov"
+  },
+  {
+    "id": "26a28ad4cfe03649",
+    "name": "2026-02-27 10.30.25.mp4",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Houseplants",
+    "activity": "Watering",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Houseplants/Watering/2026-02-27 10.30.25.mp4"
+  },
+  {
+    "id": "21df467b0f994123",
+    "name": "2026-02-27 10.32.55.mov",
+    "type": "video",
+    "category": "plant",
+    "cultivar": "Houseplants",
+    "activity": "Watering",
+    "month": "2026-02",
+    "date": "2026-02-27",
+    "path": "/Camera Uploads/2026-02/Plants/Houseplants/Watering/2026-02-27 10.32.55.mov"
   }
 ]
