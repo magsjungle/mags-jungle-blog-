@@ -144,6 +144,36 @@
     </div>
   </div>
 
+  <!-- ── Update existing post photo ── -->
+  <details class="admin-card" id="updatePhotoPanel">
+    <summary>📷 Add or Replace a Post Photo</summary>
+    <div style="height:16px"></div>
+    <p class="section-sub" style="margin-bottom:16px;">
+      Best format: <strong>landscape crop, 1200×800px or 4:3 ratio</strong>. Vertical phone photos get heavily cropped in the card thumbnail. Crop before uploading for best results.
+    </p>
+    <div class="row2">
+      <div class="fg">
+        <label>Post</label>
+        <select id="photoPostSlug" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #c8b87a;border-radius:8px;font-size:0.95rem;background:#fff;">
+          <option value="">— Save GitHub settings first —</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Action</label>
+        <select id="photoAction" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #c8b87a;border-radius:8px;font-size:0.95rem;background:#fff;">
+          <option value="thumbnail">Replace thumbnail (image shown on home page)</option>
+          <option value="add">Add as new photo inside the post</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Photo</label>
+      <input type="file" id="updatePhotoFile" accept="image/*" onchange="previewUpdatePhoto(this)">
+      <div class="photo-thumbs" id="updatePhotoThumb" style="margin-top:8px;"></div>
+    </div>
+    <button class="btn btn-green" id="btnUpdatePhoto" onclick="updatePostPhoto()">Upload Photo</button>
+  </details>
+
   <div id="statusMsg"></div>
 
 </div>
@@ -267,6 +297,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('keysPanel').open = true;
   }
   loadProducts();
+  loadPostsList();
 });
 
 function saveKeys() {
@@ -276,6 +307,97 @@ function saveKeys() {
   const msg = document.getElementById('saveMsg');
   msg.style.display = 'block';
   setTimeout(() => msg.style.display = 'none', 3000);
+  loadPostsList();
+}
+
+async function loadPostsList() {
+  if (!LS.get('ghToken') || !LS.get('ghOwner') || !LS.get('ghRepo')) return;
+  try {
+    const files  = await ghGet('posts');
+    const select = document.getElementById('photoPostSlug');
+    select.innerHTML = '<option value="">— Select a post —</option>';
+    files
+      .filter(f => f.name.endsWith('.html'))
+      .sort((a, b) => b.name.localeCompare(a.name))
+      .forEach(f => {
+        const slug = f.name.replace('.html', '');
+        const opt  = document.createElement('option');
+        opt.value  = slug;
+        opt.textContent = slug.replace(/-/g, ' ');
+        select.appendChild(opt);
+      });
+  } catch(_) {}
+}
+
+function previewUpdatePhoto(input) {
+  const container = document.getElementById('updatePhotoThumb');
+  container.innerHTML = '';
+  if (input.files[0]) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(input.files[0]);
+    container.appendChild(img);
+  }
+}
+
+async function updatePostPhoto() {
+  const slug   = document.getElementById('photoPostSlug').value;
+  const file   = document.getElementById('updatePhotoFile').files[0];
+  const action = document.getElementById('photoAction').value;
+
+  if (!slug)  return setStatus('Select a post first.', 'st-err');
+  if (!file)  return setStatus('Select a photo first.', 'st-err');
+  if (!LS.get('ghToken')) return setStatus('Save GitHub settings first.', 'st-err');
+
+  const btn = document.getElementById('btnUpdatePhoto');
+  btn.disabled = true;
+
+  try {
+    // Find next slot number for 'add', or use 1 for 'thumbnail'
+    let imgNum = 1;
+    if (action === 'add') {
+      try {
+        const allImages = await ghGet('images');
+        const nums = allImages
+          .filter(f => f.name.startsWith(slug + '-'))
+          .map(f => { const m = f.name.match(/-(\d+)\./); return m ? parseInt(m[1]) : 0; });
+        imgNum = nums.length ? Math.max(...nums) + 1 : 1;
+      } catch(_) { imgNum = 1; }
+    }
+
+    const imgPath = `images/${slug}-${imgNum}.jpg`;
+
+    // Get SHA if file already exists (needed to replace it)
+    let existingSha = null;
+    try { existingSha = (await ghGet(imgPath)).sha; } catch(_) {}
+
+    setStatus('Uploading photo…', 'info');
+    const b64 = await fileToB64(file);
+    await ghPut(imgPath, b64, existingSha, `img: ${action === 'thumbnail' ? 'replace' : 'add'} ${imgPath}`);
+
+    // If replacing thumbnail, also update index.html card
+    if (action === 'thumbnail') {
+      setStatus('Updating home page card…', 'info');
+      try {
+        const indexFile = await ghGet('index.html');
+        const current   = b64Decode(indexFile.content);
+        const imgTag    = `<img src="images/${slug}-1.jpg" alt="${slug.replace(/-/g, ' ')}">`;
+        // Replace emoji or old img inside the card for this post
+        const updated = current.replace(
+          new RegExp(`(<a href="posts/${slug}\\.html"[^>]*>[\\s\\S]*?<div class="post-card-img">)[\\s\\S]*?(</div>)`),
+          `$1${imgTag}$2`
+        );
+        if (updated !== current) {
+          await ghPut('index.html', b64Encode(updated), indexFile.sha, `index: thumbnail for ${slug}`);
+        }
+      } catch(_) {}
+    }
+
+    setStatus(`✅ Done! Photo live at /images/${imgPath.split('/')[1]} once Cloudflare deploys (~1 min).`, 'ok');
+  } catch(e) {
+    setStatus('Upload error: ' + e.message, 'st-err');
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 // ── Photo thumbnails ──────────────────────────
