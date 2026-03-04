@@ -459,7 +459,7 @@ async function publishPost() {
     setStatus('Updating home page…', 'info');
     const indexFile = await ghGet('index.html');
     const current   = b64Decode(indexFile.content);
-    const newCard   = buildCard(_parsedCard, slug);
+    const newCard   = buildCard(_parsedCard, slug, photos.length > 0);
     const updated   = current.replace(
       '<div class="post-grid">',
       '<div class="post-grid">\n\n' + newCard + '\n'
@@ -498,10 +498,13 @@ async function publishPost() {
 }
 
 // ── Card HTML for index.html ──────────────────
-function buildCard(card, slug) {
+function buildCard(card, slug, hasPhoto) {
+  const thumb = hasPhoto
+    ? `<div class="post-card-img"><img src="images/${slug}-1.jpg" alt="${card.title}"></div>`
+    : `<div class="post-card-img">${card.emoji ?? '🌿'}</div>`;
   return `    <!-- Post: ${card.title} -->
     <a href="posts/${slug}.html" class="post-card">
-      <div class="post-card-img">${card.emoji ?? '🌿'}</div>
+      ${thumb}
       <div class="post-card-body">
         <span class="post-tag">${card.tag}</span>
         <h3>${card.title}</h3>
