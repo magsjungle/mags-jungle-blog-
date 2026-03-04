@@ -108,6 +108,23 @@
       <input type="file" id="photos" multiple accept="image/*" onchange="handlePhotoSelect(this)">
       <div class="photo-thumbs" id="photoThumbs"></div>
     </div>
+
+    <!-- ── New products ── -->
+    <div style="border-top:1px solid #d4c9a8;margin:20px 0 18px;padding-top:18px;">
+      <p style="font-family:'Trebuchet MS',sans-serif;font-weight:700;color:var(--green-dark);font-size:0.9rem;margin:0 0 4px;">🛍️ New Amazon products to feature? (optional)</p>
+      <p style="font-size:0.8rem;color:#777;margin:0 0 14px;">Add 1–2 products you want in this post. They'll be woven into the content and saved to your product pool for future posts.</p>
+      <div id="newProductsWrap">
+        <div class="row2" style="margin-bottom:10px">
+          <div class="fg" style="margin:0"><input type="text" class="np-asin" placeholder="Amazon ASIN (e.g. B0CY4DP3GQ)"></div>
+          <div class="fg" style="margin:0"><input type="text" class="np-name" placeholder="Product name"></div>
+        </div>
+        <div class="row2">
+          <div class="fg" style="margin:0"><input type="text" class="np-asin" placeholder="Amazon ASIN (optional 2nd)"></div>
+          <div class="fg" style="margin:0"><input type="text" class="np-name" placeholder="Product name"></div>
+        </div>
+      </div>
+    </div>
+
     <button class="btn btn-green" id="btnGenerate" onclick="generatePost()">✨ Generate Post with Claude</button>
   </div>
 
@@ -148,6 +165,24 @@ const LS = {
   set: (k, v) => localStorage.setItem('mj_' + k, v),
 };
 
+// ── Product pool ──────────────────────────────
+let _products = [];
+
+async function loadProducts() {
+  try {
+    const res = await fetch('/data/products.json?_=' + Date.now());
+    _products = await res.json();
+  } catch (_) {
+    _products = [];
+  }
+}
+
+function getNewProducts() {
+  const asins = [...document.querySelectorAll('.np-asin')].map(el => el.value.trim()).filter(Boolean);
+  const names = [...document.querySelectorAll('.np-name')].map(el => el.value.trim());
+  return asins.map((asin, i) => ({ asin, name: names[i] || asin }));
+}
+
 // ── On load ───────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('ghToken').value = LS.get('ghToken');
@@ -156,6 +191,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!LS.get('ghToken')) {
     document.getElementById('keysPanel').open = true;
   }
+  loadProducts();
 });
 
 function saveKeys() {
@@ -260,12 +296,14 @@ async function generatePost() {
   setStatus('Generating post with Claude… this takes about 15 seconds.', 'info');
 
   try {
-    const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const monthYear  = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const newProds   = getNewProducts();
     const userContent = [
       `Category / Tag: ${tag}`,
       `Month: ${monthYear}`,
       tiktokUrl ? `TikTok URL: ${tiktokUrl}` : null,
       `Number of photos being uploaded: ${photos.length}`,
+      newProds.length ? `\nNew products to feature in this post:\n${newProds.map(p => `- ${p.asin} — ${p.name}`).join('\n')}` : null,
       '',
       'TikTok Caption / Script:',
       caption,
@@ -277,7 +315,7 @@ async function generatePost() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 4096,
-        system: SYSTEM_PROMPT,
+        system: buildSystemPrompt(),
         messages: [{ role: 'user', content: userContent }],
       }),
     });
@@ -356,6 +394,22 @@ async function publishPost() {
     }
     await ghPut('index.html', b64Encode(updated), indexFile.sha, `index: add card for "${_parsedCard.title}"`);
 
+    // 4. Save any new products to data/products.json
+    const newProds = getNewProducts();
+    if (newProds.length) {
+      setStatus('Saving new products to pool…', 'info');
+      const prodFile    = await ghGet('data/products.json');
+      const currentPool = JSON.parse(b64Decode(prodFile.content));
+      const existingAsins = currentPool.map(p => p.asin);
+      const toAdd = newProds.filter(p => p.asin && !existingAsins.includes(p.asin));
+      if (toAdd.length) {
+        const updatedPool = [...currentPool, ...toAdd];
+        await ghPut('data/products.json', b64Encode(JSON.stringify(updatedPool, null, 2)), prodFile.sha,
+          `products: add ${toAdd.map(p => p.name).join(', ')}`);
+        _products = updatedPool;
+      }
+    }
+
     setStatus(
       `✅ Published! Your post will be live at /posts/${slug}.html once Cloudflare deploys (usually ~1 min).`,
       'ok'
@@ -382,8 +436,13 @@ function buildCard(card, slug) {
     </a>`;
 }
 
-// ── System prompt for Claude ──────────────────
-const SYSTEM_PROMPT = `You write blog posts for Mags Jungle, a houseplant blog by Magui (TikTok @mags.jungle, Instagram @mags_jungle). Tagline: "Real plants. Real talk. Real results."
+// ── System prompt for Claude (built dynamically) ──
+function buildSystemPrompt() {
+  const productList = _products.length
+    ? _products.map(p => `- ${p.asin} — ${p.name}`).join('\n')
+    : '(no products loaded — do not invent any ASINs)';
+
+  return `You write blog posts for Mags Jungle, a houseplant blog by Magui (TikTok @mags.jungle, Instagram @mags_jungle). Tagline: "Real plants. Real talk. Real results."
 
 TONE: First-person, conversational, warm, honest — like a knowledgeable plant friend. Expand TikTok captions into thorough, helpful, SEO-friendly blog posts.
 
@@ -395,30 +454,17 @@ MANDATORY RULES:
 5. Always use full product names: "Purived Houseplant Food" or "Purived Cactus & Succulent Food" — never just "Purived".
 6. Affiliate tag is ALWAYS maguimartinez-20. Every Amazon link: https://www.amazon.com/dp/ASIN?tag=maguimartinez-20
 7. Only recommend products relevant to the post topic.
-8. If a TikTok URL is provided, embed it using the blockquote embed format in the template below.
-9. If N photos are uploaded, include exactly N <img> tags placed naturally in the post, using src="../images/SLUG-1.jpg", "../images/SLUG-2.jpg", etc. (where SLUG is the exact slug you put in the CARD comment). Include a <p class="image-caption"> after each image.
+8. If the user provides "New products to feature in this post", you MUST include all of them — with inline links and in the product grid.
+9. If a TikTok URL is provided, embed it using the blockquote embed format in the template below.
+10. If N photos are uploaded, include exactly N <img> tags placed naturally in the post, using src="../images/SLUG-1.jpg", "../images/SLUG-2.jpg", etc. (where SLUG is the exact slug you put in the CARD comment). Include a <p class="image-caption"> after each image.
+
+CONFIRMED AMAZON PRODUCTS — only use these ASINs:
+${productList}
 
 CONFIRMED AMAZON PRODUCTS — only use these ASINs:
 - B0CY4DP3GQ — Purived Houseplant Food
 - B0F7T7VYMJ — Purived Cactus & Succulent Food
 - B0B3WPWKM7 — Boho Plug-in Pendant Light with Hemp Rope Shade
-- B0DHYLJGGX — Treleaf Extendable Plant Trellis / Moss Pole Alternative
-- B0716D2M4T — 13-Piece Mini Succulent & Garden Tool Set
-- B09LSBPRSX — Doter Organic Perlite 1 Quart
-- B08X3RBDJ8 — Schultz Cactus Plus Liquid Plant Food 2-7-7 4oz
-- B0B2BJPFZY — GE BR30 Full Spectrum Grow Light Bulb
-- B0D22PPZCL — Fine Mist Spray Bottle
-- B09X29CCYN — Neem Oil
-- B00028EYJ8 — Peppermint Castile Soap
-- B0DTXL2QMD — Fuzzy Plant Gloves
-- B0799NMGPC — Miracle-Gro Cactus & Succulent Mix
-- B0CNRJW3WM — Pruning Shears set
-- B0B8NK8PML — SANSI LED Grow Light Bulb 10W 2-Pack
-- B07NNT3G7J — GE PAR 38 Grow Light Bulb
-- B0B1QRFPRQ — SANSI LED Grow Light 300W Full Spectrum Clip-on
-- B07BRKG7X1 — SANSI 36W Full Spectrum Grow Light Bulb
-- B0CHRW8JKM — Barrina T5 Grow Light Strips 2FT 5000K 4-Pack
-
 OUTPUT FORMAT:
 Put this comment on line 1, before <!DOCTYPE html>:
 <!-- CARD:{"slug":"your-slug","tag":"Tag","title":"Full Post Title","summary":"1-2 sentence card preview.","date":"March 2026","readingTime":"4 min read","emoji":"🌿"} -->
