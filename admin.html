@@ -149,20 +149,18 @@ const LS = {
 
 // ── On load ───────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('claudeKey').value = LS.get('claudeKey');
-  document.getElementById('ghToken').value   = LS.get('ghToken');
-  document.getElementById('ghOwner').value   = LS.get('ghOwner');
-  document.getElementById('ghRepo').value    = LS.get('ghRepo');
+  document.getElementById('ghToken').value = LS.get('ghToken');
+  document.getElementById('ghOwner').value = LS.get('ghOwner');
+  document.getElementById('ghRepo').value  = LS.get('ghRepo');
   if (!LS.get('ghToken')) {
     document.getElementById('keysPanel').open = true;
   }
 });
 
 function saveKeys() {
-  LS.set('claudeKey', document.getElementById('claudeKey').value.trim());
-  LS.set('ghToken',   document.getElementById('ghToken').value.trim());
-  LS.set('ghOwner',   document.getElementById('ghOwner').value.trim());
-  LS.set('ghRepo',    document.getElementById('ghRepo').value.trim());
+  LS.set('ghToken', document.getElementById('ghToken').value.trim());
+  LS.set('ghOwner', document.getElementById('ghOwner').value.trim());
+  LS.set('ghRepo',  document.getElementById('ghRepo').value.trim());
   setStatus('Keys saved to your browser.', 'ok');
 }
 
