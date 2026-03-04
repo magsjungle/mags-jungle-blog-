@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Post — Mags Jungle Admin</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .admin-wrap { max-width: 800px; margin: 0 auto; padding: 32px 20px 80px; }
+    .admin-card { background: var(--cream); border: 1px solid #d4c9a8; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    details.admin-card > summary { cursor: pointer; font-weight: 700; font-family: 'Trebuchet MS', sans-serif; color: var(--green-dark); font-size: 1rem; list-style: none; }
+    details.admin-card > summary::-webkit-details-marker { display: none; }
+    details.admin-card > summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open].admin-card > summary::before { content: '▼ '; }
+    .fg { margin-bottom: 16px; }
+    .fg label { display: block; font-weight: 700; font-size: 0.875rem; color: var(--green-dark); font-family: 'Trebuchet MS', sans-serif; margin-bottom: 5px; }
+    .fg input, .fg textarea { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid #c8b87a; border-radius: 8px; font-size: 0.95rem; font-family: Georgia, serif; background: #fff; }
+    .fg textarea { resize: vertical; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width: 580px) { .row2 { grid-template-columns: 1fr; } }
+    .btn { display: inline-block; padding: 11px 22px; border: none; border-radius: 8px; font-size: 0.95rem; font-family: 'Trebuchet MS', sans-serif; font-weight: 700; cursor: pointer; }
+    .btn-green { background: var(--green-dark); color: #fff; }
+    .btn-orange { background: var(--accent, #f77f00); color: #fff; }
+    .btn-gray { background: #888; color: #fff; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    #statusMsg { display: none; padding: 11px 15px; border-radius: 8px; font-family: 'Trebuchet MS', sans-serif; font-size: 0.9rem; margin-top: 16px; }
+    #statusMsg.show { display: block; }
+    .st-info { background: #e8f4fd; color: #1e5a8a; border: 1px solid #afd3ed; }
+    .st-ok   { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .st-err  { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
+    .photo-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .photo-thumbs img { width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 2px solid #c8b87a; }
+    .html-editor { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #c8b87a; border-radius: 8px; font-size: 0.78rem; font-family: monospace; background: #f9f7f0; min-height: 280px; resize: vertical; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+    .page-title { font-family: 'Trebuchet MS', sans-serif; color: var(--green-dark); font-size: 1.5rem; margin: 0 0 4px; }
+    .page-sub { font-size: 0.875rem; color: #666; margin: 0 0 24px; }
+    .section-heading { font-family: 'Trebuchet MS', sans-serif; color: var(--green-dark); font-size: 1.05rem; margin: 0 0 6px; }
+    .section-sub { font-size: 0.85rem; color: #666; margin: 0 0 16px; }
+    .keys-note { font-size: 0.78rem; color: #888; margin: 8px 0 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <h1>🌿 Mags <span>Jungle</span></h1>
+      <div class="tagline">Real plants. Real talk. Real results.</div>
+    </a>
+    <nav>
+      <a href="index.html">Blog</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="shop.html">My Favorites</a>
+      <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok</a>
+      <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="admin-wrap">
+
+  <h2 class="page-title">✍️ New Blog Post</h2>
+  <p class="page-sub">Paste your TikTok caption → Claude writes the full post → auto-publishes to GitHub.</p>
+
+  <!-- ── Settings ── -->
+  <details class="admin-card" id="keysPanel">
+    <summary>⚙️ Settings &amp; API Keys</summary>
+    <div style="height:16px"></div>
+    <div class="row2">
+      <div class="fg">
+        <label>GitHub Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="ghp_..." autocomplete="off">
+      </div>
+      <div class="fg">
+        <label>GitHub Username</label>
+        <input type="text" id="ghOwner" placeholder="yourusername">
+      </div>
+      <div class="fg">
+        <label>GitHub Repo Name</label>
+        <input type="text" id="ghRepo" placeholder="mags_jungle_blog">
+      </div>
+    </div>
+    <button class="btn btn-green" onclick="saveKeys()">Save Locally</button>
+    <p class="keys-note">Saved in your browser only — never sent anywhere except GitHub.</p>
+  </details>
+
+  <!-- ── Caption form ── -->
+  <div class="admin-card">
+    <h3 class="section-heading">Your TikTok</h3>
+    <div class="fg">
+      <label>Caption / Script *</label>
+      <textarea id="caption" rows="8" placeholder="Paste your full TikTok caption or script here..."></textarea>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Category / Tag *</label>
+        <input type="text" id="tag" placeholder="e.g. Monstera, Succulent, Jade Plant">
+      </div>
+      <div class="fg">
+        <label>TikTok Video URL (optional — embeds the video)</label>
+        <input type="url" id="tiktokUrl" placeholder="https://www.tiktok.com/@mags.jungle/video/...">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Photos (optional — will be uploaded to the repo)</label>
+      <input type="file" id="photos" multiple accept="image/*" onchange="handlePhotoSelect(this)">
+      <div class="photo-thumbs" id="photoThumbs"></div>
+    </div>
+    <button class="btn btn-green" id="btnGenerate" onclick="generatePost()">✨ Generate Post with Claude</button>
+  </div>
+
+  <!-- ── Preview / Edit ── -->
+  <div class="admin-card" id="previewCard" style="display:none">
+    <h3 class="section-heading">👀 Review &amp; Edit</h3>
+    <p class="section-sub">Edit the HTML below before publishing. What's here is exactly what gets committed.</p>
+    <textarea class="html-editor" id="htmlEditor" rows="26" spellcheck="false"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-orange" id="btnPublish" onclick="publishPost()">🚀 Publish to Blog</button>
+      <button class="btn btn-gray" onclick="generatePost()">↻ Regenerate</button>
+    </div>
+  </div>
+
+  <div id="statusMsg"></div>
+
+</div>
+</main>
+
+<footer>
+  <div class="social-links">
+    <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok @magsjungle</a>
+    <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram @mags_jungle</a>
+  </div>
+  <p>© 2026 Mags Jungle · Made with 🌿</p>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────
+   Mags Jungle — Admin Page
+   Generates blog posts from TikTok captions via
+   Claude API, then publishes to GitHub.
+───────────────────────────────────────────── */
+
+// ── LocalStorage helpers ──────────────────────
+const LS = {
+  get: k => localStorage.getItem('mj_' + k) ?? '',
+  set: (k, v) => localStorage.setItem('mj_' + k, v),
+};
+
+// ── On load ───────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('claudeKey').value = LS.get('claudeKey');
+  document.getElementById('ghToken').value   = LS.get('ghToken');
+  document.getElementById('ghOwner').value   = LS.get('ghOwner');
+  document.getElementById('ghRepo').value    = LS.get('ghRepo');
+  if (!LS.get('ghToken')) {
+    document.getElementById('keysPanel').open = true;
+  }
+});
+
+function saveKeys() {
+  LS.set('claudeKey', document.getElementById('claudeKey').value.trim());
+  LS.set('ghToken',   document.getElementById('ghToken').value.trim());
+  LS.set('ghOwner',   document.getElementById('ghOwner').value.trim());
+  LS.set('ghRepo',    document.getElementById('ghRepo').value.trim());
+  setStatus('Keys saved to your browser.', 'ok');
+}
+
+// ── Photo thumbnails ──────────────────────────
+function handlePhotoSelect(input) {
+  const container = document.getElementById('photoThumbs');
+  container.innerHTML = '';
+  for (const file of input.files) {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    container.appendChild(img);
+  }
+}
+
+// ── Status ────────────────────────────────────
+function setStatus(msg, type = 'info') {
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = 'show st-' + type;
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Base64 helpers (Unicode-safe) ─────────────
+function b64Encode(str) {
+  return btoa(
+    encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+      (_, p1) => String.fromCharCode('0x' + p1))
+  );
+}
+
+function b64Decode(b64) {
+  return decodeURIComponent(
+    atob(b64.replace(/\n/g, '')).split('').map(c =>
+      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    ).join('')
+  );
+}
+
+async function fileToB64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── GitHub API ────────────────────────────────
+function ghHeaders() {
+  return {
+    'Authorization': `token ${LS.get('ghToken')}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json',
+  };
+}
+
+function ghBase() {
+  return `https://api.github.com/repos/${LS.get('ghOwner')}/${LS.get('ghRepo')}/contents`;
+}
+
+async function ghGet(path) {
+  const res = await fetch(`${ghBase()}/${path}`, { headers: ghHeaders() });
+  if (!res.ok) throw new Error(`GitHub GET /${path}: ${res.status} — ${await res.text()}`);
+  return res.json();
+}
+
+async function ghPut(path, contentB64, sha, message) {
+  const body = { message, content: contentB64 };
+  if (sha) body.sha = sha;
+  const res = await fetch(`${ghBase()}/${path}`, {
+    method: 'PUT',
+    headers: ghHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`GitHub PUT /${path}: ${res.status} — ${await res.text()}`);
+  return res.json();
+}
+
+// ── State ─────────────────────────────────────
+let _parsedCard = null;
+
+// ── Generate ──────────────────────────────────
+async function generatePost() {
+  const caption   = document.getElementById('caption').value.trim();
+  const tag       = document.getElementById('tag').value.trim();
+  const tiktokUrl = document.getElementById('tiktokUrl').value.trim();
+  const photos    = document.getElementById('photos').files;
+
+  if (!caption) return setStatus('Please enter a TikTok caption.', 'st-err');
+  if (!tag)     return setStatus('Please enter a category / tag.', 'st-err');
+
+  const btn = document.getElementById('btnGenerate');
+  btn.disabled = true;
+  setStatus('Generating post with Claude… this takes about 15 seconds.', 'info');
+
+  try {
+    const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const userContent = [
+      `Category / Tag: ${tag}`,
+      `Month: ${monthYear}`,
+      tiktokUrl ? `TikTok URL: ${tiktokUrl}` : null,
+      `Number of photos being uploaded: ${photos.length}`,
+      '',
+      'TikTok Caption / Script:',
+      caption,
+    ].filter(s => s !== null).join('\n');
+
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4096,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userContent }],
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message ?? `Claude API error ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    let html = data.content[0].text.trim();
+    // Strip markdown code fences if Claude added them
+    html = html.replace(/^```html?\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+
+    // Parse CARD metadata
+    const m = html.match(/<!--\s*CARD:(\{[\s\S]*?\})\s*-->/);
+    if (!m) throw new Error('Claude did not include CARD metadata. Try regenerating.');
+    _parsedCard = JSON.parse(m[1]);
+
+    document.getElementById('htmlEditor').value = html;
+    document.getElementById('previewCard').style.display = 'block';
+    document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth' });
+    setStatus('Done! Review the post below, then click Publish.', 'ok');
+
+  } catch (e) {
+    setStatus('Error: ' + e.message, 'st-err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Publish ───────────────────────────────────
+async function publishPost() {
+  const html = document.getElementById('htmlEditor').value.trim();
+  if (!html || !_parsedCard) return setStatus('Generate a post first.', 'st-err');
+
+  if (!LS.get('ghToken') || !LS.get('ghOwner') || !LS.get('ghRepo')) {
+    return setStatus('Fill in GitHub settings in Settings above.', 'st-err');
+  }
+
+  // Re-parse card in case user edited the HTML
+  const m = html.match(/<!--\s*CARD:(\{[\s\S]*?\})\s*-->/);
+  if (m) {
+    try { _parsedCard = JSON.parse(m[1]); } catch(_) {}
+  }
+
+  const slug   = _parsedCard.slug;
+  const photos = document.getElementById('photos').files;
+  const btn    = document.getElementById('btnPublish');
+  btn.disabled = true;
+
+  try {
+    // 1. Upload photos
+    for (let i = 0; i < photos.length; i++) {
+      setStatus(`Uploading photo ${i + 1} of ${photos.length}…`, 'info');
+      const b64 = await fileToB64(photos[i]);
+      await ghPut(`images/${slug}-${i + 1}.jpg`, b64, null, `img: add ${slug}-${i + 1}.jpg`);
+    }
+
+    // 2. Commit post HTML (strip the CARD comment)
+    setStatus('Committing post HTML…', 'info');
+    const postHtml = html.replace(/^<!--\s*CARD:[\s\S]*?-->\n?/, '').trimStart();
+    await ghPut(`posts/${slug}.html`, b64Encode(postHtml), null, `post: ${_parsedCard.title}`);
+
+    // 3. Update index.html — add new card at top of post-grid
+    setStatus('Updating home page…', 'info');
+    const indexFile = await ghGet('index.html');
+    const current   = b64Decode(indexFile.content);
+    const newCard   = buildCard(_parsedCard, slug);
+    const updated   = current.replace(
+      '<div class="post-grid">',
+      '<div class="post-grid">\n\n' + newCard + '\n'
+    );
+    if (updated === current) {
+      throw new Error('Could not find post-grid in index.html — post was committed but home page was not updated. Add the card manually.');
+    }
+    await ghPut('index.html', b64Encode(updated), indexFile.sha, `index: add card for "${_parsedCard.title}"`);
+
+    setStatus(
+      `✅ Published! Your post will be live at /posts/${slug}.html once Cloudflare deploys (usually ~1 min).`,
+      'ok'
+    );
+
+  } catch (e) {
+    setStatus('Publish error: ' + e.message, 'st-err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Card HTML for index.html ──────────────────
+function buildCard(card, slug) {
+  return `    <!-- Post: ${card.title} -->
+    <a href="posts/${slug}.html" class="post-card">
+      <div class="post-card-img">${card.emoji ?? '🌿'}</div>
+      <div class="post-card-body">
+        <span class="post-tag">${card.tag}</span>
+        <h3>${card.title}</h3>
+        <p>${card.summary}</p>
+        <div class="post-card-meta">${card.date} · ${card.readingTime}</div>
+      </div>
+    </a>`;
+}
+
+// ── System prompt for Claude ──────────────────
+const SYSTEM_PROMPT = `You write blog posts for Mags Jungle, a houseplant blog by Magui (TikTok @mags.jungle, Instagram @mags_jungle). Tagline: "Real plants. Real talk. Real results."
+
+TONE: First-person, conversational, warm, honest — like a knowledgeable plant friend. Expand TikTok captions into thorough, helpful, SEO-friendly blog posts.
+
+MANDATORY RULES:
+1. Every post MUST have inline affiliate links within the body text (not only in the product grid).
+2. Every post MUST have a product grid at the bottom with 3–6 relevant products.
+3. NEVER invent Amazon ASINs. Only use products from the confirmed list below.
+4. Never fabricate plant care facts — only include accurate, real information.
+5. Always use full product names: "Purived Houseplant Food" or "Purived Cactus & Succulent Food" — never just "Purived".
+6. Affiliate tag is ALWAYS maguimartinez-20. Every Amazon link: https://www.amazon.com/dp/ASIN?tag=maguimartinez-20
+7. Only recommend products relevant to the post topic.
+8. If a TikTok URL is provided, embed it using the blockquote embed format in the template below.
+9. If N photos are uploaded, include exactly N <img> tags placed naturally in the post, using src="../images/SLUG-1.jpg", "../images/SLUG-2.jpg", etc. (where SLUG is the exact slug you put in the CARD comment). Include a <p class="image-caption"> after each image.
+
+CONFIRMED AMAZON PRODUCTS — only use these ASINs:
+- B0CY4DP3GQ — Purived Houseplant Food
+- B0F7T7VYMJ — Purived Cactus & Succulent Food
+- B0B3WPWKM7 — Boho Plug-in Pendant Light with Hemp Rope Shade
+- B0DHYLJGGX — Treleaf Extendable Plant Trellis / Moss Pole Alternative
+- B0716D2M4T — 13-Piece Mini Succulent & Garden Tool Set
+- B09LSBPRSX — Doter Organic Perlite 1 Quart
+- B08X3RBDJ8 — Schultz Cactus Plus Liquid Plant Food 2-7-7 4oz
+- B0B2BJPFZY — GE BR30 Full Spectrum Grow Light Bulb
+- B0D22PPZCL — Fine Mist Spray Bottle
+- B09X29CCYN — Neem Oil
+- B00028EYJ8 — Peppermint Castile Soap
+- B0DTXL2QMD — Fuzzy Plant Gloves
+- B0799NMGPC — Miracle-Gro Cactus & Succulent Mix
+- B0CNRJW3WM — Pruning Shears set
+- B0B8NK8PML — SANSI LED Grow Light Bulb 10W 2-Pack
+- B07NNT3G7J — GE PAR 38 Grow Light Bulb
+- B0B1QRFPRQ — SANSI LED Grow Light 300W Full Spectrum Clip-on
+- B07BRKG7X1 — SANSI 36W Full Spectrum Grow Light Bulb
+- B0CHRW8JKM — Barrina T5 Grow Light Strips 2FT 5000K 4-Pack
+
+OUTPUT FORMAT:
+Put this comment on line 1, before <!DOCTYPE html>:
+<!-- CARD:{"slug":"your-slug","tag":"Tag","title":"Full Post Title","summary":"1-2 sentence card preview.","date":"March 2026","readingTime":"4 min read","emoji":"🌿"} -->
+
+CARD rules:
+- slug: lowercase, hyphens only, 3–6 words, SEO-friendly, must exactly match what you use in image src paths
+- emoji: fitting plant/nature emoji
+- summary: engaging 1–2 sentences written for a blog home page card
+- readingTime: honest estimate based on post word count
+
+Then output the complete HTML file using this exact structure:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[Post Title] — Mags Jungle</title>
+  <meta name="description" content="[SEO description 145–160 characters]" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="../index.html" class="logo">
+      <h1>🌿 Mags <span>Jungle</span></h1>
+      <div class="tagline">Real plants. Real talk. Real results.</div>
+    </a>
+    <nav>
+      <a href="../index.html">Blog</a>
+      <a href="../reviews.html">Reviews</a>
+      <a href="../shop.html">My Favorites</a>
+      <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok</a>
+      <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="post-header">
+    <span class="post-tag">[Tag]</span>
+    <h1>[Full Post Title]</h1>
+    <div class="post-meta">
+      By <a href="https://www.instagram.com/mags_jungle" target="_blank">Magui</a> &nbsp;·&nbsp;
+      [Month Year] &nbsp;·&nbsp; [X] min read &nbsp;·&nbsp;
+      Originally on <a href="https://www.tiktok.com/@mags.jungle" target="_blank">@magsjungle TikTok</a>
+    </div>
+  </div>
+
+  <p class="post-intro">
+    [Engaging hook — 2-3 sentences. First thing the reader sees.]
+  </p>
+
+  [IF TikTok URL provided, include this embed block:
+  <blockquote class="tiktok-embed"
+    cite="[TIKTOK_URL]"
+    data-video-id="[VIDEO_ID_FROM_URL]"
+    style="max-width:605px; min-width:325px; margin:28px auto;">
+    <section>
+      <a href="[TIKTOK_URL]" target="_blank">Watch on TikTok @mags.jungle</a>
+    </section>
+  </blockquote>
+  <` + `script async src="https://www.tiktok.com/embed.js"><` + `/script>
+  ]
+
+  <div class="post-body">
+
+    [Body with h2 section headings, paragraphs, inline affiliate links woven naturally into the text]
+
+    [Photo placement example:
+    <img src="../images/SLUG-1.jpg" alt="[descriptive alt text]" class="post-image">
+    <p class="image-caption">[Caption for the photo]</p>
+    ]
+
+    <h2>Products I Use 🛍️</h2>
+    <p class="affiliate-notice">
+      * These are affiliate links — if you buy through them, I earn a small commission at no extra cost to you. I only recommend products I actually use on my own plants.
+    </p>
+
+    <div class="product-grid">
+
+      [Repeat for each product (3–6 relevant ones):
+      <div class="product-card">
+        <div class="product-icon">[emoji]</div>
+        <h4>[Product Name]</h4>
+        <p>[Why I use it — 1-2 sentences in first person]</p>
+        <a href="https://www.amazon.com/dp/[ASIN]?tag=maguimartinez-20" target="_blank" class="btn-amazon">Find on Amazon →</a>
+      </div>
+      ]
+
+    </div>
+
+    [Warm closing paragraph + call to action to follow on TikTok/Instagram]
+
+  </div>
+
+  <div class="tiktok-box" style="margin-top:40px;">
+    <p>Liked this post? Follow for more honest plant care tips every week.</p>
+    <a href="https://www.tiktok.com/@mags.jungle" target="_blank" class="btn-tiktok">
+      Follow @magsjungle on TikTok ↗
+    </a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="social-links">
+    <a href="https://www.tiktok.com/@mags.jungle" target="_blank">TikTok @magsjungle</a>
+    <a href="https://www.instagram.com/mags_jungle" target="_blank">Instagram @mags_jungle</a>
+  </div>
+  <p>© 2026 Mags Jungle · Made with 🌿 · <em>Some links are affiliate links. I only recommend products I actually use.</em></p>
+</footer>
+
+</body>
+</html>`;
+</script>
+
+</body>
+</html>
