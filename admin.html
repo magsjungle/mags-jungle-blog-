@@ -83,6 +83,7 @@
     </div>
     <button class="btn btn-green" onclick="saveKeys()">Save Locally</button>
     <p class="keys-note">Saved in your browser only — never sent anywhere except GitHub.</p>
+    <div id="saveMsg" style="display:none;margin-top:10px;padding:10px 14px;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:8px;font-family:'Trebuchet MS',sans-serif;font-size:0.9rem;">✅ Keys saved!</div>
   </details>
 
   <!-- ── Caption form ── -->
@@ -161,7 +162,9 @@ function saveKeys() {
   LS.set('ghToken', document.getElementById('ghToken').value.trim());
   LS.set('ghOwner', document.getElementById('ghOwner').value.trim());
   LS.set('ghRepo',  document.getElementById('ghRepo').value.trim());
-  setStatus('Keys saved to your browser.', 'ok');
+  const msg = document.getElementById('saveMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
 }
 
 // ── Photo thumbnails ──────────────────────────
