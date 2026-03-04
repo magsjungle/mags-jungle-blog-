@@ -109,17 +109,22 @@
       <div class="photo-thumbs" id="photoThumbs"></div>
     </div>
 
-    <!-- ── New products ── -->
+    <!-- ── Product suggestions ── -->
     <div style="border-top:1px solid #d4c9a8;margin:20px 0 18px;padding-top:18px;">
-      <p style="font-family:'Trebuchet MS',sans-serif;font-weight:700;color:var(--green-dark);font-size:0.9rem;margin:0 0 4px;">🛍️ New Amazon products to feature? (optional)</p>
-      <p style="font-size:0.8rem;color:#777;margin:0 0 14px;">Add 1–2 products you want in this post. They'll be woven into the content and saved to your product pool for future posts.</p>
-      <div id="newProductsWrap">
-        <div class="row2" style="margin-bottom:10px">
-          <div class="fg" style="margin:0"><input type="text" class="np-asin" placeholder="Amazon ASIN (e.g. B0CY4DP3GQ)"></div>
-          <div class="fg" style="margin:0"><input type="text" class="np-name" placeholder="Product name"></div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+        <p style="font-family:'Trebuchet MS',sans-serif;font-weight:700;color:var(--green-dark);font-size:0.9rem;margin:0;">🛍️ Product link opportunities</p>
+        <button class="btn btn-gray" id="btnSuggest" onclick="suggestProducts()" style="padding:6px 14px;font-size:0.8rem;">Get ideas from Claude</button>
+      </div>
+      <p style="font-size:0.8rem;color:#777;margin:0 0 12px;">Claude will read your caption and suggest specific products that fit. Enter the ASIN for any you want included — all optional. New products are saved to your pool.</p>
+      <div id="suggestionsWrap" style="display:none">
+        <div id="suggestionsList"></div>
+        <div style="margin-top:10px;">
+          <button class="btn btn-gray" onclick="addManualProduct()" style="padding:6px 14px;font-size:0.8rem;">+ Add a product manually</button>
         </div>
+      </div>
+      <div id="manualWrap" style="display:none;margin-top:12px;">
         <div class="row2">
-          <div class="fg" style="margin:0"><input type="text" class="np-asin" placeholder="Amazon ASIN (optional 2nd)"></div>
+          <div class="fg" style="margin:0"><input type="text" class="np-asin" placeholder="ASIN"></div>
           <div class="fg" style="margin:0"><input type="text" class="np-name" placeholder="Product name"></div>
         </div>
       </div>
@@ -178,9 +183,79 @@ async function loadProducts() {
 }
 
 function getNewProducts() {
-  const asins = [...document.querySelectorAll('.np-asin')].map(el => el.value.trim()).filter(Boolean);
-  const names = [...document.querySelectorAll('.np-name')].map(el => el.value.trim());
-  return asins.map((asin, i) => ({ asin, name: names[i] || asin }));
+  const rows = [...document.querySelectorAll('.np-row')];
+  return rows.map(row => ({
+    asin: row.querySelector('.np-asin').value.trim(),
+    name: row.querySelector('.np-name').value.trim(),
+  })).filter(p => p.asin);
+}
+
+async function suggestProducts() {
+  const caption = document.getElementById('caption').value.trim();
+  const tag     = document.getElementById('tag').value.trim();
+  if (!caption) return setStatus('Enter your caption first.', 'st-err');
+
+  const btn = document.getElementById('btnSuggest');
+  btn.disabled = true;
+  btn.textContent = 'Thinking…';
+
+  try {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 400,
+        messages: [{
+          role: 'user',
+          content: `You help a houseplant blogger (Mags Jungle) find Amazon product link opportunities for blog posts.\n\nPost topic: ${tag}\nCaption: ${caption}\n\nSuggest 4–6 specific Amazon product types that would be natural affiliate links in this blog post. Think beyond fertilizer — consider pots, soil mixes, hangers, tools, décor, humidity trays, etc.\n\nReturn ONLY a JSON array, no explanation:\n[{"label":"Clear orchid pot","reason":"shows roots"},{"label":"Orchid bark potting mix","reason":"repotting mentioned"}]`
+        }],
+      }),
+    });
+
+    const data = await resp.json();
+    let raw = data.content[0].text.trim();
+    raw = raw.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '').trim();
+    const suggestions = JSON.parse(raw);
+
+    const list = document.getElementById('suggestionsList');
+    list.innerHTML = '';
+    suggestions.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'np-row row2';
+      div.style.cssText = 'margin-bottom:8px;align-items:center;';
+      div.innerHTML = `
+        <div class="fg" style="margin:0">
+          <label style="font-size:0.78rem;color:#555;font-weight:400;">${s.label} <span style="color:#aaa">— ${s.reason}</span></label>
+          <input type="text" class="np-asin" placeholder="ASIN (leave blank to skip)">
+        </div>
+        <div class="fg" style="margin:0;padding-top:18px;">
+          <input type="text" class="np-name" value="${s.label}">
+        </div>`;
+      list.appendChild(div);
+    });
+
+    document.getElementById('suggestionsWrap').style.display = 'block';
+    setStatus('Got it! Enter ASINs for any products you want in the post — leave others blank.', 'ok');
+  } catch (e) {
+    setStatus('Suggestion error: ' + e.message, 'st-err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Get ideas from Claude';
+  }
+}
+
+function addManualProduct() {
+  const wrap = document.getElementById('manualWrap');
+  wrap.style.display = 'block';
+  // Add a new row
+  const div = document.createElement('div');
+  div.className = 'np-row row2';
+  div.style.marginBottom = '8px';
+  div.innerHTML = `
+    <div class="fg" style="margin:0"><input type="text" class="np-asin" placeholder="ASIN"></div>
+    <div class="fg" style="margin:0"><input type="text" class="np-name" placeholder="Product name"></div>`;
+  wrap.appendChild(div);
 }
 
 // ── On load ───────────────────────────────────
