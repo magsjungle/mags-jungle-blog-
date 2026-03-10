@@ -21107,5 +21107,38 @@
     "month": "2026-03",
     "date": "2026-03-08",
     "path": "/Camera Uploads/Magui Photos/2026-03-08 15.08.35.mov"
+  },
+  {
+    "id": "3fc7d0091683f6f6",
+    "name": "2026-03-09 12.29.15.jpg",
+    "type": "photo",
+    "category": "plant",
+    "cultivar": "Flowers",
+    "activity": "Watering",
+    "month": "2026-03",
+    "date": "2026-03-09",
+    "path": "/Camera Uploads/2026-03/Plants/Flowers/Watering/2026-03-09 12.29.15.jpg"
+  },
+  {
+    "id": "5ca0d9cc6ad5a560",
+    "name": "2026-03-09 10.25.59.jpg",
+    "type": "photo",
+    "category": "plant",
+    "cultivar": "Houseplants",
+    "activity": "Watering",
+    "month": "2026-03",
+    "date": "2026-03-09",
+    "path": "/Camera Uploads/2026-03/Plants/Houseplants/Watering/2026-03-09 10.25.59.jpg"
+  },
+  {
+    "id": "46e45f3f3daaecdd",
+    "name": "2026-03-09 08.33.06.mov",
+    "type": "video",
+    "category": "dog",
+    "cultivar": "",
+    "activity": "",
+    "month": "2026-03",
+    "date": "2026-03-09",
+    "path": "/Camera Uploads/Magui Photos/Dogs/2026-03-09 08.33.06.mov"
   }
 ]
